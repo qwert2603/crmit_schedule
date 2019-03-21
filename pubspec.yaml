@@ -24,3 +24,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  fonts:
+  - family: google_sans
+    fonts:
+    - asset: android/app/src/main/res/font/google_sans.ttf

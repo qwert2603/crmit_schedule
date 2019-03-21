@@ -12,6 +12,8 @@ class MyApp extends StatelessWidget {
       title: 'crmit_schedule',
       theme: ThemeData(
         primarySwatch: Colors.red,
+        scaffoldBackgroundColor: Colors.white,
+        fontFamily: "google_sans",
       ),
       home: MyHomePage(),
     );
@@ -61,7 +63,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildDayOfWeek(DayOfWeek dayOfWeek) {
-    var scheduleGroups = dayOfWeek.scheduleGroups
+    const textStyle = TextStyle(
+      fontFamily: "google_sans",
+      fontSize: 16,
+    );
+
+    final scheduleGroups = dayOfWeek.scheduleGroups
         .where((s) => s is ScheduleGroup && s.dayOfWeek == dayOfWeek.dayOfWeek)
         .map((s) => InkWell(
               onTap: () => print("onTap $s"),
@@ -70,10 +77,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(
-                      "${s.time ?? "без 🕑"} ${s.groupName}",
-                      style: const TextStyle(fontSize: 16),
-                    ),
+                    RichText(
+                        text: TextSpan(
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: s.time ?? "без 🕑",
+                          style: textStyle.copyWith(
+                            color: Colors.black.withOpacity(0.65),
+                          ),
+                        ),
+                        TextSpan(text: " "),
+                        TextSpan(
+                          text: s.groupName,
+                          style: textStyle.copyWith(
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    )),
                     const Icon(Icons.keyboard_arrow_right),
                   ],
                 ),
