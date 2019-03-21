@@ -66,6 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
     const textStyle = TextStyle(
       fontFamily: "google_sans",
       fontSize: 16,
+      color: Colors.black,
     );
 
     final scheduleGroups = dayOfWeek.scheduleGroups
@@ -87,12 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                         TextSpan(text: " "),
-                        TextSpan(
-                          text: s.groupName,
-                          style: textStyle.copyWith(
-                            color: Colors.black,
-                          ),
-                        ),
+                        TextSpan(text: s.groupName, style: textStyle),
                       ],
                     )),
                     const Icon(Icons.keyboard_arrow_right),
