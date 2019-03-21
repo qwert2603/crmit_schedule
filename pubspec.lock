@@ -16,7 +16,7 @@ packages:
     source: hosted
     version: "1.5.1"
   async:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: async
       url: "https://pub.dartlang.org"
@@ -146,6 +146,20 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_redux:
+    dependency: "direct main"
+    description:
+      name: flutter_redux
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.3"
+  flutter_redux_dev_tools:
+    dependency: "direct main"
+    description:
+      name: flutter_redux_dev_tools
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -173,7 +187,7 @@ packages:
     source: hosted
     version: "0.2.0"
   http:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: http
       url: "https://pub.dartlang.org"
@@ -312,6 +326,34 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
+  redux:
+    dependency: transitive
+    description:
+      name: redux
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.0"
+  redux_dev_tools:
+    dependency: transitive
+    description:
+      name: redux_dev_tools
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.0"
+  redux_epics:
+    dependency: "direct main"
+    description:
+      name: redux_epics
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.10.4"
+  rxdart:
+    dependency: "direct main"
+    description:
+      name: rxdart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.20.0"
   shelf:
     dependency: transitive
     description:
