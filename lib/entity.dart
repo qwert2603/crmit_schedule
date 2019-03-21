@@ -3,17 +3,10 @@ import 'package:meta/meta.dart';
 
 part 'entity.g.dart';
 
-abstract class ScheduleListItem {
-  final int dayOfWeek;
-
-  ScheduleListItem([this.dayOfWeek]);
-}
-
 @immutable
 @JsonSerializable()
-class ScheduleGroup implements ScheduleListItem {
+class ScheduleGroup {
   final int id;
-  @override
   final int dayOfWeek;
   final String time;
   final int groupId;
@@ -35,15 +28,16 @@ class ScheduleGroup implements ScheduleListItem {
 }
 
 @immutable
-class DayOfWeek implements ScheduleListItem {
-  @override
+class DayOfWeek {
   final int dayOfWeek;
 
-  const DayOfWeek(this.dayOfWeek);
+  final List<ScheduleGroup> scheduleGroups;
+
+  DayOfWeek(this.dayOfWeek, this.scheduleGroups);
 
   @override
   String toString() {
-    return 'DayOfWeek{dayOfWeek: $dayOfWeek}';
+    return 'DayOfWeek{dayOfWeek: $dayOfWeek, scheduleGroups: $scheduleGroups}';
   }
 }
 

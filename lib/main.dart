@@ -26,7 +26,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final repo = Repo();
 
-  List<ScheduleListItem> _scheduleItems;
+  List<DayOfWeek> _schedule;
 
   @override
   void initState() {
@@ -34,9 +34,9 @@ class _MyHomePageState extends State<MyHomePage> {
     _loadSchedule();
   }
 
-  void _loadSchedule() async {
+  Future<void> _loadSchedule() async {
     final schedule = await repo.getScheduleGroups();
-    setState(() => _scheduleItems = schedule);
+    setState(() => _schedule = schedule);
   }
 
   @override
@@ -45,51 +45,59 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text("crmit_schedule"),
       ),
-      body: _scheduleItems == null
+      body: _schedule == null
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : Scrollbar(
-              child: ListView.builder(
-                itemCount: _scheduleItems.length,
-                itemBuilder: (context, i) =>
-                    _buildScheduleItem(_scheduleItems[i]),
+          : RefreshIndicator(
+              child: Scrollbar(
+                child: ListView.builder(
+                  itemCount: _schedule.length,
+                  itemBuilder: (context, i) => _buildDayOfWeek(_schedule[i]),
+                ),
               ),
-            ),
+              onRefresh: _loadSchedule),
     );
   }
 
-  Widget _buildScheduleItem(ScheduleListItem scheduleListItem) {
-    if (scheduleListItem is ScheduleGroup) {
-      return InkWell(
-        onTap: () => print("onTap $scheduleListItem"),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Text(
-            "${scheduleListItem.time ?? "без 🕑"} ${scheduleListItem.groupName}",
-            style: const TextStyle(
-              fontSize: 16,
+  Widget _buildDayOfWeek(DayOfWeek dayOfWeek) {
+    var scheduleGroups = dayOfWeek.scheduleGroups
+        .where((s) => s is ScheduleGroup && s.dayOfWeek == dayOfWeek.dayOfWeek)
+        .map((s) => InkWell(
+              onTap: () => print("onTap $s"),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      "${s.time ?? "без 🕑"} ${s.groupName}",
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const Icon(Icons.keyboard_arrow_right),
+                  ],
+                ),
+              ),
+            ));
+
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      elevation: 4,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Text(
+              DAYS_OF_WEEK_NAMES[dayOfWeek.dayOfWeek],
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
           ),
-        ),
-      );
-    }
-    if (scheduleListItem is DayOfWeek) {
-      return Card(
-        margin: EdgeInsets.all(12),
-        elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Text(
-            DAYS_OF_WEEK_NAMES[scheduleListItem.dayOfWeek],
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-        ),
-      );
-    }
-    throw Exception("unknown ScheduleListItem $scheduleListItem");
+        ]..addAll(scheduleGroups),
+      ),
+    );
   }
 }
