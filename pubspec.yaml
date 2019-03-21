@@ -28,4 +28,4 @@ flutter:
   fonts:
   - family: google_sans
     fonts:
-    - asset: android/app/src/main/res/font/google_sans.ttf
+    - asset: assets/google_sans.ttf
