@@ -103,9 +103,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      elevation: 4,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(),
+        borderRadius: BorderRadius.circular(4),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(12),
