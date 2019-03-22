@@ -2,9 +2,18 @@ import 'dart:convert';
 
 import 'package:crmit_schedule/const.dart';
 import 'package:crmit_schedule/entity.dart';
+import 'package:crmit_schedule/state.dart';
 import 'package:http/http.dart' as http;
 
 class Repo {
+  Future<ScheduleInitialModel> getScheduleInitialModel() async {
+    return Future.wait([
+      getTeachersList(),
+      getScheduleGroups(),
+      getAuthedTeacherId(),
+    ]).then((list) => ScheduleInitialModel(list[0], list[1], list[2]));
+  }
+
   Future<List<DayOfWeek>> getScheduleGroups() async {
     final url = _addAccessToken("$BASE_URL$API_PREFIX/schedule");
     final http.Response response = await http.get(url);
@@ -20,6 +29,10 @@ class Repo {
     _checkStatusCode(response);
     final List list = json.decode(response.body);
     return list.map((q) => Teacher.fromJson(q)).toList();
+  }
+
+  Future<int> getAuthedTeacherId() async {
+    return 1;
   }
 
   void _checkStatusCode(http.Response response) {

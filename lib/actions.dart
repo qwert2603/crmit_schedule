@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:crmit_schedule/entity.dart';
+import 'package:crmit_schedule/state.dart';
 
 class LoadItems {}
 
@@ -9,9 +9,9 @@ class LoadItemsStarted {}
 class LoadItemsError {}
 
 class ItemsLoaded {
-  final List<DayOfWeek> items;
+  final ScheduleInitialModel model;
 
-  ItemsLoaded(this.items);
+  ItemsLoaded(this.model);
 }
 
 class RefreshItems {

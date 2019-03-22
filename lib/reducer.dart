@@ -10,7 +10,7 @@ class ScheduleReducer implements ReducerClass<ScheduleViewState> {
       return state.copy(schedule: Loading(), refreshError: false);
     if (action is LoadItemsError) return state.copy(schedule: LoadingError());
     if (action is ItemsLoaded)
-      return state.copy(schedule: Loaded(action.items));
+      return state.copy(schedule: Loaded(action.model));
     if (action is RefreshItems) return state.copy(refreshError: false);
     if (action is RefreshError) return state.copy(refreshError: true);
     return state;

@@ -9,7 +9,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 class _ScheduleViewModel {
-  final LrState schedule;
+  final LrState lrState;
   final void Function() onRetry;
   final Future<void> Function() onRefresh;
 
@@ -24,11 +24,11 @@ class _ScheduleViewModel {
           },
         );
 
-  _ScheduleViewModel(this.schedule, this.onRetry, this.onRefresh);
+  _ScheduleViewModel(this.lrState, this.onRetry, this.onRefresh);
 
   @override
   String toString() {
-    return '_ScheduleViewModel{schedule: $schedule, onRetry: $onRetry, onRefresh: $onRefresh}';
+    return '_ScheduleViewModel{lrState: $lrState, onRetry: $onRetry, onRefresh: $onRefresh}';
   }
 }
 
@@ -53,14 +53,14 @@ class ScheduleScreen extends StatelessWidget {
         converter: (store) => _ScheduleViewModel.fromStore(store),
         builder: (BuildContext context, _ScheduleViewModel vm) {
           print("ScheduleScreen builder $vm");
-          final schedule = vm.schedule;
-          if (schedule is Nth) return Container();
-          if (schedule is Loading) {
+          final lrState = vm.lrState;
+          if (lrState is Nth) return Container();
+          if (lrState is Loading) {
             return Center(
               child: CircularProgressIndicator(),
             );
           }
-          if (schedule is LoadingError) {
+          if (lrState is LoadingError) {
             return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -81,7 +81,7 @@ class ScheduleScreen extends StatelessWidget {
               ),
             );
           }
-          if (schedule is Loaded<List<DayOfWeek>>) {
+          if (lrState is Loaded<ScheduleInitialModel>) {
             return Stack(
               children: <Widget>[
                 RefreshIndicator(
@@ -89,9 +89,12 @@ class ScheduleScreen extends StatelessWidget {
                   onRefresh: vm.onRefresh,
                   child: Scrollbar(
                     child: ListView.builder(
-                      itemCount: schedule.data.length,
+                      itemCount: lrState.data.schedule.length,
                       itemBuilder: (BuildContext context, int i) =>
-                          _buildDayOfWeek(schedule.data[i]),
+                          _buildDayOfWeek(
+                            lrState.data.schedule[i],
+                            lrState.data.authedTeacherId,
+                          ),
                       controller: _scrollController,
                     ),
                   ),
@@ -108,7 +111,7 @@ class ScheduleScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDayOfWeek(DayOfWeek dayOfWeek) {
+  Widget _buildDayOfWeek(DayOfWeek dayOfWeek, int authedTeacherId) {
     const textStyle = TextStyle(
       fontFamily: "google_sans",
       fontSize: 16,
@@ -134,7 +137,12 @@ class ScheduleScreen extends StatelessWidget {
                           ),
                         ),
                         TextSpan(text: " "),
-                        TextSpan(text: s.groupName, style: textStyle),
+                        TextSpan(
+                          text: s.groupName,
+                          style: s.teacherId == authedTeacherId
+                              ? textStyle.copyWith(color: Colors.red)
+                              : textStyle,
+                        ),
                       ],
                     )),
                     const Icon(Icons.keyboard_arrow_right),

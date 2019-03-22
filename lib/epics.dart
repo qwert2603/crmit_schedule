@@ -13,7 +13,7 @@ class LoadEpic implements EpicClass<ScheduleViewState> {
   Stream<dynamic> call(
       Stream<dynamic> actions, EpicStore<ScheduleViewState> store) {
     return Observable(actions).ofType(TypeToken<LoadItems>()).switchMap((_) {
-      return Observable(repo.getScheduleGroups().asStream())
+      return Observable(repo.getScheduleInitialModel().asStream())
           .map<dynamic>((items) => ItemsLoaded(items))
           .onErrorReturnWith((e) {
         print("LoadEpic error $e");
@@ -40,7 +40,7 @@ class RefreshEpic implements EpicClass<ScheduleViewState> {
         }
       }
 
-      return Observable(repo.getScheduleGroups().asStream())
+      return Observable(repo.getScheduleInitialModel().asStream())
           .map<dynamic>((items) => ItemsLoaded(items))
           .onErrorReturnWith((e) {
             print("RefreshEpic error $e");
