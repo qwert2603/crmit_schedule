@@ -41,4 +41,23 @@ class DayOfWeek {
   }
 }
 
+@immutable
+@JsonSerializable()
+class Teacher {
+  final int id;
+  final String fio;
+
+  const Teacher(this.id, this.fio);
+
+  factory Teacher.fromJson(Map<String, dynamic> json) =>
+      _$TeacherFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TeacherToJson(this);
+
+  @override
+  String toString() {
+    return 'Teacher{id: $id, fio: $fio}';
+  }
+}
+
 // flutter packages pub run build_runner build

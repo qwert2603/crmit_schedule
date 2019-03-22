@@ -25,3 +25,10 @@ Map<String, dynamic> _$ScheduleGroupToJson(ScheduleGroup instance) =>
       'groupName': instance.groupName,
       'teacherId': instance.teacherId
     };
+
+Teacher _$TeacherFromJson(Map<String, dynamic> json) {
+  return Teacher(json['id'] as int, json['fio'] as String);
+}
+
+Map<String, dynamic> _$TeacherToJson(Teacher instance) =>
+    <String, dynamic>{'id': instance.id, 'fio': instance.fio};

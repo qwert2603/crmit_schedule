@@ -14,6 +14,14 @@ class Repo {
     return _makeSchedule(scheduleGroups);
   }
 
+  Future<List<Teacher>> getTeachersList() async {
+    final url = _addAccessToken("$BASE_URL$API_PREFIX/teachers_list");
+    final http.Response response = await http.get(url);
+    _checkStatusCode(response);
+    final List list = json.decode(response.body);
+    return list.map((q) => Teacher.fromJson(q)).toList();
+  }
+
   void _checkStatusCode(http.Response response) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw Exception("response.statusCode == ${response.statusCode}");
@@ -21,7 +29,7 @@ class Repo {
   }
 
   String _addAccessToken(String url) =>
-      "$url?access_token=${_getAccessToken()}";
+      "$url${url.contains('?') ? "&" : "?"}access_token=${_getAccessToken()}";
 
   String _getAccessToken() => "ac28bd98-afc4-4310-90ee-017515a636ba";
 
@@ -39,8 +47,14 @@ class Repo {
 
 void main() async {
   final repo = Repo();
+
   final schedule = await repo.getScheduleGroups();
   for (final s in schedule) {
     print(s);
+  }
+
+  final teachers = await repo.getTeachersList();
+  for (final t in teachers) {
+    print(t);
   }
 }
