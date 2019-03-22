@@ -37,14 +37,20 @@ class ScheduleInitialModel {
 
 @immutable
 class ScheduleViewState {
-  final LrState schedule;
+  final LrState lrState;
   final bool refreshError;
+  final int selectedTeacherId;
 
-  ScheduleViewState(this.schedule, this.refreshError);
+  ScheduleViewState(this.lrState, this.refreshError, this.selectedTeacherId);
 
-  ScheduleViewState copy({LrState schedule, bool refreshError}) =>
+  ScheduleViewState copy({
+    LrState lrState,
+    bool refreshError,
+    int selectedTeacherId,
+  }) =>
       ScheduleViewState(
-        schedule ?? this.schedule,
+        lrState ?? this.lrState,
         refreshError ?? this.refreshError,
+        selectedTeacherId ?? this.selectedTeacherId,
       );
 }

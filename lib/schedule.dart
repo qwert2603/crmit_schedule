@@ -10,25 +10,30 @@ import 'package:redux/redux.dart';
 
 class _ScheduleViewModel {
   final LrState lrState;
+  final int selectedTeacherId;
   final void Function() onRetry;
   final Future<void> Function() onRefresh;
+  final void Function(int) onTeacherSelected;
 
   _ScheduleViewModel.fromStore(Store<ScheduleViewState> store)
       : this(
-          store.state.schedule,
+          store.state.lrState,
+          store.state.selectedTeacherId,
           () => store.dispatch(LoadItems()),
           () {
             var refreshItems = RefreshItems();
             store.dispatch(refreshItems);
             return refreshItems.completer.future;
           },
+          (teacherId) => store.dispatch(SelectedTeacherChanged(teacherId)),
         );
 
-  _ScheduleViewModel(this.lrState, this.onRetry, this.onRefresh);
+  _ScheduleViewModel(this.lrState, this.selectedTeacherId, this.onRetry,
+      this.onRefresh, this.onTeacherSelected);
 
   @override
   String toString() {
-    return '_ScheduleViewModel{lrState: $lrState, onRetry: $onRetry, onRefresh: $onRefresh}';
+    return '_ScheduleViewModel{lrState: $lrState, selectedTeacherId: $selectedTeacherId, onRetry: $onRetry, onRefresh: $onRefresh, onTeacherSelected: $onTeacherSelected}';
   }
 }
 
@@ -85,33 +90,31 @@ class ScheduleScreen extends StatelessWidget {
             return Stack(
               children: <Widget>[
                 Column(
-                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: DropdownButtonFormField<int>(
-                          decoration: InputDecoration(
-                            labelText: "Преподаватель",
-                            border: const OutlineInputBorder(),
-                          ),
-                          value: 1,
-                          items: lrState.data.teachers
-                              .map(
-                                (teacher) => DropdownMenuItem(
-                                      child: Text(teacher.fio),
-                                      value: teacher.id,
-                                    ),
-                              )
-                              .toList()
-                                ..insert(
-                                    0,
-                                    DropdownMenuItem(
-                                      child: Text("все"),
-                                      value: 0,
-                                    )),
-                          onChanged: (teacherId) {
-                            print("DropdownButton $teacherId");
-                          }),
+                        decoration: InputDecoration(
+                          labelText: "Преподаватель",
+                          border: const OutlineInputBorder(),
+                        ),
+                        value: vm.selectedTeacherId ?? 0,
+                        items: lrState.data.teachers
+                            .map(
+                              (teacher) => DropdownMenuItem(
+                                    child: Text(teacher.fio),
+                                    value: teacher.id,
+                                  ),
+                            )
+                            .toList()
+                              ..insert(
+                                  0,
+                                  DropdownMenuItem(
+                                    child: Text("все"),
+                                    value: 0,
+                                  )),
+                        onChanged: vm.onTeacherSelected,
+                      ),
                     ),
                     SizedBox(
                       height: 1,
@@ -123,6 +126,7 @@ class ScheduleScreen extends StatelessWidget {
                         onRefresh: vm.onRefresh,
                         child: Scrollbar(
                           child: ListView.builder(
+                            physics: AlwaysScrollableScrollPhysics(),
                             itemCount: lrState.data.schedule.length,
                             itemBuilder: (BuildContext context, int i) =>
                                 _buildDayOfWeek(

@@ -12,8 +12,17 @@ class LoadEpic implements EpicClass<ScheduleViewState> {
   @override
   Stream<dynamic> call(
       Stream<dynamic> actions, EpicStore<ScheduleViewState> store) {
-    return Observable(actions).ofType(TypeToken<LoadItems>()).switchMap((_) {
-      return Observable(repo.getScheduleInitialModel().asStream())
+    var observable = Observable(actions);
+
+    return Observable.merge([
+      observable
+          .ofType(TypeToken<LoadItems>())
+          .map((_) => store.state.selectedTeacherId),
+      observable
+          .ofType(TypeToken<SelectedTeacherChanged>())
+          .map((action) => action.selectedTeacherId),
+    ]).switchMap((teacherId) {
+      return Observable(repo.getScheduleInitialModel(teacherId).asStream())
           .map<dynamic>((items) => ItemsLoaded(items))
           .onErrorReturnWith((e) {
         print("LoadEpic error $e");
@@ -31,7 +40,8 @@ class RefreshEpic implements EpicClass<ScheduleViewState> {
   @override
   Stream<dynamic> call(
       Stream<dynamic> actions, EpicStore<ScheduleViewState> store) {
-    final Observable observable = Observable(actions);
+    final Observable observable = Observable(actions)
+        /*.doOnData((q) => print("RefreshEpic observable doOnData $q"))*/;
     return observable.ofType(TypeToken<RefreshItems>()).switchMap((action) {
       onFinish() {
         print("RefreshItems.completer.complete()");
@@ -40,7 +50,9 @@ class RefreshEpic implements EpicClass<ScheduleViewState> {
         }
       }
 
-      return Observable(repo.getScheduleInitialModel().asStream())
+      return Observable(repo
+              .getScheduleInitialModel(store.state.selectedTeacherId)
+              .asStream())
           .map<dynamic>((items) => ItemsLoaded(items))
           .onErrorReturnWith((e) {
             print("RefreshEpic error $e");
@@ -48,7 +60,8 @@ class RefreshEpic implements EpicClass<ScheduleViewState> {
           })
           .doOnDone(onFinish)
           .doOnCancel(onFinish)
-          .takeUntil(observable.where((a) => a is LoadItems));
+          .takeUntil(observable
+              .where((a) => a is LoadItems || a is SelectedTeacherChanged));
     });
   }
 }

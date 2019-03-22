@@ -19,3 +19,9 @@ class RefreshItems {
 }
 
 class RefreshError {}
+
+class SelectedTeacherChanged {
+  final int selectedTeacherId;
+
+  SelectedTeacherChanged(this.selectedTeacherId);
+}

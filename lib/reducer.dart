@@ -7,12 +7,18 @@ class ScheduleReducer implements ReducerClass<ScheduleViewState> {
   ScheduleViewState call(ScheduleViewState state, dynamic action) {
     print("ScheduleReducer $action");
     if (action is LoadItemsStarted)
-      return state.copy(schedule: Loading(), refreshError: false);
-    if (action is LoadItemsError) return state.copy(schedule: LoadingError());
+      return state.copy(lrState: Loading(), refreshError: false);
+    if (action is LoadItemsError) return state.copy(lrState: LoadingError());
     if (action is ItemsLoaded)
-      return state.copy(schedule: Loaded(action.model));
+      return state.copy(
+        lrState: Loaded(action.model),
+        selectedTeacherId:
+            state.selectedTeacherId ?? action.model.authedTeacherId,
+      );
     if (action is RefreshItems) return state.copy(refreshError: false);
     if (action is RefreshError) return state.copy(refreshError: true);
+    if (action is SelectedTeacherChanged)
+      return state.copy(selectedTeacherId: action.selectedTeacherId);
     return state;
   }
 }

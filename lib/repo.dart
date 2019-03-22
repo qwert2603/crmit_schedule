@@ -6,16 +6,20 @@ import 'package:crmit_schedule/state.dart';
 import 'package:http/http.dart' as http;
 
 class Repo {
-  Future<ScheduleInitialModel> getScheduleInitialModel() async {
-    return Future.wait([
-      getTeachersList(),
-      getScheduleGroups(),
-      getAuthedTeacherId(),
-    ]).then((list) => ScheduleInitialModel(list[0], list[1], list[2]));
+  Future<ScheduleInitialModel> getScheduleInitialModel(int teacherId) async {
+    return getAuthedTeacherIdOrZero().then((authedTeacherId) => Future.wait([
+          getTeachersList(),
+          getScheduleGroups(teacherId ?? authedTeacherId),
+        ]).then((list) => ScheduleInitialModel(
+              list[0],
+              list[1],
+              authedTeacherId,
+            )));
   }
 
-  Future<List<DayOfWeek>> getScheduleGroups() async {
-    final url = _addAccessToken("$BASE_URL$API_PREFIX/schedule");
+  Future<List<DayOfWeek>> getScheduleGroups(int teacherId) async {
+    final url = _addAccessToken(
+        "$BASE_URL$API_PREFIX/schedule${teacherId != null ? "?teacherId=$teacherId" : ""}");
     final http.Response response = await http.get(url);
     _checkStatusCode(response);
     final List list = json.decode(response.body);
@@ -31,7 +35,7 @@ class Repo {
     return list.map((q) => Teacher.fromJson(q)).toList();
   }
 
-  Future<int> getAuthedTeacherId() async {
+  Future<int> getAuthedTeacherIdOrZero() async {
     return 1;
   }
 
@@ -61,7 +65,7 @@ class Repo {
 void main() async {
   final repo = Repo();
 
-  final schedule = await repo.getScheduleGroups();
+  final schedule = await repo.getScheduleGroups(1);
   for (final s in schedule) {
     print(s);
   }
