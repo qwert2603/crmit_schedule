@@ -15,9 +15,10 @@ void main() {
 
   final store = DevToolsStore<ScheduleViewState>(
     ScheduleReducer(),
-    initialState: ScheduleViewState(Nth()),
+    initialState: ScheduleViewState(Nth(), false),
     middleware: [
       EpicMiddleware<ScheduleViewState>(LoadEpic(repo)),
+      EpicMiddleware<ScheduleViewState>(RefreshEpic(repo)),
     ],
   );
 

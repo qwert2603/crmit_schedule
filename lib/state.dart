@@ -14,9 +14,13 @@ class Loaded<T> implements LrState {
 
 class ScheduleViewState {
   final LrState schedule;
+  final bool refreshError;
 
-  ScheduleViewState(this.schedule);
+  ScheduleViewState(this.schedule, this.refreshError);
 
-  ScheduleViewState copy({LrState schedule}) =>
-      ScheduleViewState(schedule ?? this.schedule);
+  ScheduleViewState copy({LrState schedule, bool refreshError}) =>
+      ScheduleViewState(
+        schedule ?? this.schedule,
+        refreshError ?? this.refreshError,
+      );
 }

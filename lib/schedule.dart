@@ -1,6 +1,7 @@
 import 'package:crmit_schedule/actions.dart';
 import 'package:crmit_schedule/const.dart';
 import 'package:crmit_schedule/entity.dart';
+import 'package:crmit_schedule/refresh_error_snackbar.dart';
 import 'package:crmit_schedule/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -9,17 +10,28 @@ import 'package:redux/redux.dart';
 class _ScheduleViewModel {
   final LrState schedule;
   final void Function() onRetry;
+  final Future<void> Function() onRefresh;
 
   _ScheduleViewModel.fromStore(Store<ScheduleViewState> store)
-      : this(store.state.schedule, () => store.dispatch(LoadItems()));
+      : this(
+          store.state.schedule,
+          () => store.dispatch(LoadItems()),
+          () {
+            var refreshItems = RefreshItems();
+            store.dispatch(refreshItems);
+            return refreshItems.completer.future;
+          },
+        );
 
-  _ScheduleViewModel(this.schedule, this.onRetry);
+  _ScheduleViewModel(this.schedule, this.onRetry, this.onRefresh);
 
   @override
   String toString() {
-    return '_ScheduleViewModel{schedule: $schedule, onRetry: $onRetry}';
+    return '_ScheduleViewModel{schedule: $schedule, onRetry: $onRetry, onRefresh: $onRefresh}';
   }
 }
+
+final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
 class ScheduleScreen extends StatelessWidget {
   @override
@@ -61,12 +73,23 @@ class ScheduleScreen extends StatelessWidget {
             );
           }
           if (schedule is Loaded<List<DayOfWeek>>) {
-            return Scrollbar(
-              child: ListView.builder(
-                itemCount: schedule.data.length,
-                itemBuilder: (BuildContext context, int i) =>
-                    _buildDayOfWeek(schedule.data[i]),
-              ),
+            return Stack(
+              children: <Widget>[
+                RefreshIndicator(
+                  key: _refreshIndicatorKey,
+                  onRefresh: vm.onRefresh,
+                  child: Scrollbar(
+                    child: ListView.builder(
+                      itemCount: schedule.data.length,
+                      itemBuilder: (BuildContext context, int i) =>
+                          _buildDayOfWeek(schedule.data[i]),
+                    ),
+                  ),
+                ),
+                RefreshErrorSnackbar(
+                  () => _refreshIndicatorKey.currentState.show(),
+                ),
+              ],
             );
           }
           throw Exception("unknown lrState $vm.schedule");
