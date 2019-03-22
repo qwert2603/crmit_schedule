@@ -42,8 +42,7 @@ class RefreshEpic implements EpicClass<ScheduleViewState> {
   @override
   Stream<dynamic> call(
       Stream<dynamic> actions, EpicStore<ScheduleViewState> store) {
-    final Observable observable = Observable(actions)
-        /*.doOnData((q) => print("RefreshEpic observable doOnData $q"))*/;
+    final Observable observable = Observable(actions);
     return observable.ofType(TypeToken<RefreshItems>()).switchMap((action) {
       onFinish() {
         print("RefreshItems.completer.complete()");
