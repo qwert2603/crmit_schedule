@@ -84,20 +84,57 @@ class ScheduleScreen extends StatelessWidget {
           if (lrState is Loaded<ScheduleInitialModel>) {
             return Stack(
               children: <Widget>[
-                RefreshIndicator(
-                  key: _refreshIndicatorKey,
-                  onRefresh: vm.onRefresh,
-                  child: Scrollbar(
-                    child: ListView.builder(
-                      itemCount: lrState.data.schedule.length,
-                      itemBuilder: (BuildContext context, int i) =>
-                          _buildDayOfWeek(
-                            lrState.data.schedule[i],
-                            lrState.data.authedTeacherId,
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: DropdownButtonFormField<int>(
+                          decoration: InputDecoration(
+                            labelText: "Преподаватель",
+                            border: const OutlineInputBorder(),
                           ),
-                      controller: _scrollController,
+                          value: 1,
+                          items: lrState.data.teachers
+                              .map(
+                                (teacher) => DropdownMenuItem(
+                                      child: Text(teacher.fio),
+                                      value: teacher.id,
+                                    ),
+                              )
+                              .toList()
+                                ..insert(
+                                    0,
+                                    DropdownMenuItem(
+                                      child: Text("все"),
+                                      value: 0,
+                                    )),
+                          onChanged: (teacherId) {
+                            print("DropdownButton $teacherId");
+                          }),
                     ),
-                  ),
+                    SizedBox(
+                      height: 1,
+                      child: Container(color: Colors.black26),
+                    ),
+                    Flexible(
+                      child: RefreshIndicator(
+                        key: _refreshIndicatorKey,
+                        onRefresh: vm.onRefresh,
+                        child: Scrollbar(
+                          child: ListView.builder(
+                            itemCount: lrState.data.schedule.length,
+                            itemBuilder: (BuildContext context, int i) =>
+                                _buildDayOfWeek(
+                                  lrState.data.schedule[i],
+                                  lrState.data.authedTeacherId,
+                                ),
+                            controller: _scrollController,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 RefreshErrorSnackbar(
                   () => _refreshIndicatorKey.currentState.show(),
@@ -155,7 +192,7 @@ class ScheduleScreen extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       elevation: 0,
       shape: RoundedRectangleBorder(
-        side: BorderSide(),
+        side: BorderSide(color: Colors.black54),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Column(
