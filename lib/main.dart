@@ -19,6 +19,7 @@ void main() {
     middleware: [
       EpicMiddleware<ScheduleViewState>(LoadEpic(repo)),
       EpicMiddleware<ScheduleViewState>(RefreshEpic(repo)),
+      NavigationMiddleware(repo),
     ],
   );
 

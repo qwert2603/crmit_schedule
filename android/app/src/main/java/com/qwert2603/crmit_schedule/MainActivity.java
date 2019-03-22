@@ -1,6 +1,7 @@
 package com.qwert2603.crmit_schedule;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import io.flutter.app.FlutterActivity;
 import io.flutter.plugin.common.MethodChannel;
@@ -18,7 +19,7 @@ public class MainActivity extends FlutterActivity {
                 .setMethodCallHandler(
                         (call, result) -> {
                             if (call.method.contentEquals("getAuthedTeacherIdOrZero")) {
-                                result.success(1);
+                                result.success(0);
                                 return;
                             }
                             if (call.method.contentEquals("getAccessToken")) {
@@ -26,8 +27,14 @@ public class MainActivity extends FlutterActivity {
                                 return;
                             }
                             if (call.method.contentEquals("on401")) {
-                                result.success("ok");
+                                result.success(null);
                                 methodChannel.invokeMethod("clearCache", null);
+                                return;
+                            }
+                            if (call.method.contentEquals("navigateToGroup")) {
+                                int groupId = call.argument("groupId");
+                                Log.d("AASSDD", "MainActivity navigateToGroup " + groupId);
+                                result.success(null);
                                 return;
                             }
                             result.notImplemented();

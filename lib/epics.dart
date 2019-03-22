@@ -1,6 +1,7 @@
 import 'package:crmit_schedule/actions.dart';
 import 'package:crmit_schedule/repo.dart';
 import 'package:crmit_schedule/state.dart';
+import 'package:redux/redux.dart';
 import 'package:redux_epics/redux_epics.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -64,5 +65,21 @@ class RefreshEpic implements EpicClass<ScheduleViewState> {
           .takeUntil(observable
               .where((a) => a is LoadItems || a is SelectedTeacherChanged));
     });
+  }
+}
+
+class NavigationMiddleware implements MiddlewareClass<ScheduleViewState> {
+  final Repo repo;
+
+  NavigationMiddleware(this.repo);
+
+  @override
+  void call(
+      Store<ScheduleViewState> store, dynamic action, NextDispatcher next) {
+    if (action is NavigateToGroup) {
+      repo.navigateToGroup(action.groupId);
+    } else {
+      next(action);
+    }
   }
 }

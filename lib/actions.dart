@@ -25,3 +25,9 @@ class SelectedTeacherChanged {
 
   SelectedTeacherChanged(this.selectedTeacherId);
 }
+
+class NavigateToGroup {
+  final int groupId;
+
+  NavigateToGroup(this.groupId);
+}

@@ -14,6 +14,7 @@ class _ScheduleViewModel {
   final void Function() onRetry;
   final Future<void> Function() onRefresh;
   final void Function(int) onTeacherSelected;
+  final void Function(int) onGroupClicked;
 
   _ScheduleViewModel.fromStore(Store<ScheduleViewState> store)
       : this(
@@ -26,14 +27,15 @@ class _ScheduleViewModel {
             return refreshItems.completer.future;
           },
           (teacherId) => store.dispatch(SelectedTeacherChanged(teacherId)),
+          (groupId) => store.dispatch(NavigateToGroup(groupId)),
         );
 
   _ScheduleViewModel(this.lrState, this.selectedTeacherId, this.onRetry,
-      this.onRefresh, this.onTeacherSelected);
+      this.onRefresh, this.onTeacherSelected, this.onGroupClicked);
 
   @override
   String toString() {
-    return '_ScheduleViewModel{lrState: $lrState, selectedTeacherId: $selectedTeacherId, onRetry: $onRetry, onRefresh: $onRefresh, onTeacherSelected: $onTeacherSelected}';
+    return '_ScheduleViewModel{lrState: $lrState, selectedTeacherId: $selectedTeacherId, onRetry: $onRetry, onRefresh: $onRefresh, onTeacherSelected: $onTeacherSelected, onGroupClicked: $onGroupClicked}';
   }
 }
 
@@ -146,6 +148,7 @@ class ScheduleScreen extends StatelessWidget {
                                       _buildDayOfWeek(
                                         lrState.data.schedule[i],
                                         lrState.data.authedTeacherId,
+                                        vm.onGroupClicked,
                                       ),
                                   controller: _scrollController,
                                 ),
@@ -179,7 +182,11 @@ class ScheduleScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDayOfWeek(DayOfWeek dayOfWeek, int authedTeacherId) {
+  Widget _buildDayOfWeek(
+    DayOfWeek dayOfWeek,
+    int authedTeacherId,
+    void Function(int) onGroupClicked,
+  ) {
     const textStyle = TextStyle(
       fontFamily: "google_sans",
       fontSize: 16,
@@ -189,7 +196,7 @@ class ScheduleScreen extends StatelessWidget {
     final scheduleGroups = dayOfWeek.scheduleGroups
         .where((s) => s is ScheduleGroup && s.dayOfWeek == dayOfWeek.dayOfWeek)
         .map((s) => InkWell(
-              onTap: () => print("onTap $s"),
+              onTap: () => onGroupClicked(s.groupId),
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Row(

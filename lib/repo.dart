@@ -25,6 +25,10 @@ class Repo {
     });
   }
 
+  void navigateToGroup(int groupId) {
+    _schedulePlatform.invokeMethod("navigateToGroup", {"groupId": groupId});
+  }
+
   Future<ScheduleInitialModel> getScheduleInitialModel(
       int teacherId, bool allowCache) {
     return getAuthedTeacherIdOrZero().then((authedTeacherId) {
