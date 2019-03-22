@@ -124,18 +124,32 @@ class ScheduleScreen extends StatelessWidget {
                       child: RefreshIndicator(
                         key: _refreshIndicatorKey,
                         onRefresh: vm.onRefresh,
-                        child: Scrollbar(
-                          child: ListView.builder(
-                            physics: AlwaysScrollableScrollPhysics(),
-                            itemCount: lrState.data.schedule.length,
-                            itemBuilder: (BuildContext context, int i) =>
-                                _buildDayOfWeek(
-                                  lrState.data.schedule[i],
-                                  lrState.data.authedTeacherId,
+                        child: lrState.data.schedule.isNotEmpty
+                            ? Scrollbar(
+                                child: ListView.builder(
+                                  physics: AlwaysScrollableScrollPhysics(),
+                                  itemCount: lrState.data.schedule.length,
+                                  itemBuilder: (BuildContext context, int i) =>
+                                      _buildDayOfWeek(
+                                        lrState.data.schedule[i],
+                                        lrState.data.authedTeacherId,
+                                      ),
+                                  controller: _scrollController,
                                 ),
-                            controller: _scrollController,
-                          ),
-                        ),
+                              )
+                            : ListView(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.all(24),
+                                    child: Center(
+                                      child: Text(
+                                        "Нет расписания",
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
                       ),
                     ),
                   ],
