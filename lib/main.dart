@@ -1,124 +1,49 @@
-import 'package:crmit_schedule/const.dart';
-import 'package:crmit_schedule/entity.dart';
+import 'package:crmit_schedule/actions.dart';
+import 'package:crmit_schedule/epics.dart';
+import 'package:crmit_schedule/reducer.dart';
 import 'package:crmit_schedule/repo.dart';
+import 'package:crmit_schedule/schedule.dart';
+import 'package:crmit_schedule/state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_dev_tools/redux_dev_tools.dart';
+import 'package:redux_epics/redux_epics.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'crmit_schedule',
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-        scaffoldBackgroundColor: Colors.white,
-        fontFamily: "google_sans",
-      ),
-      home: MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
+void main() {
   final repo = Repo();
 
-  List<DayOfWeek> _schedule;
+  final store = DevToolsStore<ScheduleViewState>(
+    ScheduleReducer(),
+    initialState: ScheduleViewState(Nth()),
+    middleware: [
+      EpicMiddleware<ScheduleViewState>(LoadEpic(repo)),
+    ],
+  );
 
-  @override
-  void initState() {
-    super.initState();
-    _loadSchedule();
-  }
+  runApp(MyApp(store: store));
+}
 
-  Future<void> _loadSchedule() async {
-    final schedule = await repo.getScheduleGroups();
-    setState(() => _schedule = schedule);
-  }
+class MyApp extends StatelessWidget {
+  final Store<ScheduleViewState> store;
+
+  const MyApp({Key key, @required this.store}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("crmit_schedule"),
-      ),
-      body: _schedule == null
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : RefreshIndicator(
-              child: Scrollbar(
-                child: ListView.builder(
-                  itemCount: _schedule.length,
-                  itemBuilder: (context, i) => _buildDayOfWeek(_schedule[i]),
-                ),
+    return StoreProvider<ScheduleViewState>(
+      store: store,
+      child: StoreBuilder<ScheduleViewState>(
+        onInit: (store) => store.dispatch(LoadItems()),
+        builder: (context, store) => MaterialApp(
+              title: 'crmit_schedule',
+              theme: ThemeData(
+                primarySwatch: Colors.red,
+                scaffoldBackgroundColor: Colors.white,
+                fontFamily: "google_sans",
               ),
-              onRefresh: _loadSchedule),
-    );
-  }
-
-  Widget _buildDayOfWeek(DayOfWeek dayOfWeek) {
-    const textStyle = TextStyle(
-      fontFamily: "google_sans",
-      fontSize: 16,
-      color: Colors.black,
-    );
-
-    final scheduleGroups = dayOfWeek.scheduleGroups
-        .where((s) => s is ScheduleGroup && s.dayOfWeek == dayOfWeek.dayOfWeek)
-        .map((s) => InkWell(
-              onTap: () => print("onTap $s"),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    RichText(
-                        text: TextSpan(
-                      children: <TextSpan>[
-                        TextSpan(
-                          text: s.time ?? "без 🕑",
-                          style: textStyle.copyWith(
-                            color: Colors.black.withOpacity(0.65),
-                          ),
-                        ),
-                        TextSpan(text: " "),
-                        TextSpan(text: s.groupName, style: textStyle),
-                      ],
-                    )),
-                    const Icon(Icons.keyboard_arrow_right),
-                  ],
-                ),
-              ),
-            ));
-
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              DAYS_OF_WEEK_NAMES[dayOfWeek.dayOfWeek],
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
+              home: ScheduleScreen(),
             ),
-          ),
-        ]..addAll(scheduleGroups),
       ),
     );
   }
