@@ -21,7 +21,7 @@ class _ScheduleViewModel {
           store.state.selectedTeacherId,
           () => store.dispatch(LoadItems()),
           () {
-            var refreshItems = RefreshItems();
+            final refreshItems = RefreshItems();
             store.dispatch(refreshItems);
             return refreshItems.completer.future;
           },
@@ -90,7 +90,20 @@ class ScheduleScreen extends StatelessWidget {
             return Stack(
               children: <Widget>[
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+                    lrState.data.isCached
+                        ? Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 4,
+                              horizontal: 12,
+                            ).copyWith(top: 8),
+                            child: Text(
+                              "Показаны кешированные данные",
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
+                            ))
+                        : Container(),
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: DropdownButtonFormField<int>(

@@ -12,7 +12,7 @@ class LoadEpic implements EpicClass<ScheduleViewState> {
   @override
   Stream<dynamic> call(
       Stream<dynamic> actions, EpicStore<ScheduleViewState> store) {
-    var observable = Observable(actions);
+    final observable = Observable(actions);
 
     return Observable.merge([
       observable
@@ -22,7 +22,8 @@ class LoadEpic implements EpicClass<ScheduleViewState> {
           .ofType(TypeToken<SelectedTeacherChanged>())
           .map((action) => action.selectedTeacherId),
     ]).switchMap((teacherId) {
-      return Observable(repo.getScheduleInitialModel(teacherId).asStream())
+      return Observable(
+              repo.getScheduleInitialModel(teacherId, true).asStream())
           .map<dynamic>((items) => ItemsLoaded(items))
           .onErrorReturnWith((e) {
         print("LoadEpic error $e");
@@ -51,7 +52,7 @@ class RefreshEpic implements EpicClass<ScheduleViewState> {
       }
 
       return Observable(repo
-              .getScheduleInitialModel(store.state.selectedTeacherId)
+              .getScheduleInitialModel(store.state.selectedTeacherId, false)
               .asStream())
           .map<dynamic>((items) => ItemsLoaded(items))
           .onErrorReturnWith((e) {

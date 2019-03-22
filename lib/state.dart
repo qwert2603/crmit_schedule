@@ -23,15 +23,17 @@ class Loaded<T> implements LrState {
 
 @immutable
 class ScheduleInitialModel {
+  final bool isCached;
   final List<Teacher> teachers;
   final List<DayOfWeek> schedule;
   final int authedTeacherId;
 
-  ScheduleInitialModel(this.teachers, this.schedule, this.authedTeacherId);
+  ScheduleInitialModel(
+      this.isCached, this.teachers, this.schedule, this.authedTeacherId);
 
   @override
   String toString() {
-    return 'ScheduleInitialModel{teachers: $teachers, schedule: $schedule, authedTeacherId: $authedTeacherId}';
+    return 'ScheduleInitialModel{isCached: $isCached, teachers: $teachers, schedule: $schedule, authedTeacherId: $authedTeacherId}';
   }
 }
 

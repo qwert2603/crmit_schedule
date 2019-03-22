@@ -1,20 +1,53 @@
 import 'dart:convert';
 
+import 'package:crmit_schedule/cache.dart';
 import 'package:crmit_schedule/const.dart';
 import 'package:crmit_schedule/entity.dart';
 import 'package:crmit_schedule/state.dart';
 import 'package:http/http.dart' as http;
 
 class Repo {
-  Future<ScheduleInitialModel> getScheduleInitialModel(int teacherId) async {
-    return getAuthedTeacherIdOrZero().then((authedTeacherId) => Future.wait([
-          getTeachersList(),
-          getScheduleGroups(teacherId ?? authedTeacherId),
-        ]).then((list) => ScheduleInitialModel(
+  final Cache _cache = Cache();
+
+  Future<ScheduleInitialModel> getScheduleInitialModel(
+      int teacherId, bool allowCache) {
+    return getAuthedTeacherIdOrZero().then((authedTeacherId) {
+      teacherId = teacherId ?? authedTeacherId;
+      return Future.wait([
+        getTeachersList(),
+        getScheduleGroups(teacherId),
+      ]).then((list) async {
+        List<Teacher> teachers = list[0];
+        List<DayOfWeek> schedule = list[1];
+        await _cache.saveSchedule(schedule
+            .map((dow) => dow.scheduleGroups)
+            .fold([], (l1, l2) => l1 + l2));
+        await _cache.saveTeachersList(teachers);
+        return ScheduleInitialModel(
+          false,
+          teachers,
+          schedule,
+          authedTeacherId,
+        );
+      }).catchError((e) {
+        if (allowCache) {
+          print("getScheduleInitialModel $e");
+          return Future.wait([
+            _cache.getTeachersList(),
+            _cache.getSchedule(teacherId),
+          ]).then((list) {
+            return ScheduleInitialModel(
+              true,
               list[0],
-              list[1],
+              _makeSchedule(list[1]),
               authedTeacherId,
-            )));
+            );
+          });
+        } else {
+          throw e;
+        }
+      });
+    });
   }
 
   Future<List<DayOfWeek>> getScheduleGroups(int teacherId) async {
@@ -74,4 +107,6 @@ void main() async {
   for (final t in teachers) {
     print(t);
   }
+
+//  await repo.getScheduleInitialModel(1, true);
 }
