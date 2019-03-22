@@ -1,5 +1,6 @@
 import 'package:crmit_schedule/actions.dart';
 import 'package:crmit_schedule/const.dart';
+import 'package:crmit_schedule/custom_app_bar.dart';
 import 'package:crmit_schedule/entity.dart';
 import 'package:crmit_schedule/refresh_error_snackbar.dart';
 import 'package:crmit_schedule/state.dart';
@@ -32,13 +33,21 @@ class _ScheduleViewModel {
 }
 
 final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+final _scrollController = ScrollController();
 
 class ScheduleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("crmit_schedule"),
+      appBar: CustomAppBar(
+        appBar: AppBar(
+          title: Text("crmit_schedule"),
+        ),
+        onTap: () => _scrollController.animateTo(
+              0,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+            ),
       ),
       body: StoreConnector<ScheduleViewState, _ScheduleViewModel>(
         converter: (store) => _ScheduleViewModel.fromStore(store),
@@ -83,6 +92,7 @@ class ScheduleScreen extends StatelessWidget {
                       itemCount: schedule.data.length,
                       itemBuilder: (BuildContext context, int i) =>
                           _buildDayOfWeek(schedule.data[i]),
+                      controller: _scrollController,
                     ),
                   ),
                 ),
@@ -120,7 +130,7 @@ class ScheduleScreen extends StatelessWidget {
                         TextSpan(
                           text: s.time ?? "без 🕑",
                           style: textStyle.copyWith(
-                            color: Colors.black.withOpacity(0.65),
+                            color: Color(0xFF707070),
                           ),
                         ),
                         TextSpan(text: " "),
