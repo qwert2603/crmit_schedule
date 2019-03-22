@@ -102,8 +102,10 @@ class ScheduleScreen extends StatelessWidget {
                             ).copyWith(top: 8),
                             child: Text(
                               "Показаны кешированные данные",
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
                             ))
                         : Container(),
                     Padding(
