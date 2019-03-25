@@ -48,7 +48,7 @@ class ScheduleScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         appBar: AppBar(
-          title: Text("crmit_schedule"),
+          title: Text("Расписание"),
         ),
         onTap: () => _scrollController.animateTo(
               0,

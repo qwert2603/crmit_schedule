@@ -19,11 +19,11 @@ public class MainActivity extends FlutterActivity {
                 .setMethodCallHandler(
                         (call, result) -> {
                             if (call.method.contentEquals("getAuthedTeacherIdOrZero")) {
-                                result.success(0);
+                                result.success(1);
                                 return;
                             }
                             if (call.method.contentEquals("getAccessToken")) {
-                                result.success("ac28bd98-afc4-4310-90ee-017515a636ba");
+                                result.success("bfe36786-ef73-4897-adc2-9304205a2d98");
                                 return;
                             }
                             if (call.method.contentEquals("on401")) {

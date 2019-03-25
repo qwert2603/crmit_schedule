@@ -35,18 +35,19 @@ class Repo {
       teacherId = teacherId ?? authedTeacherId;
       return Future.wait([
         getTeachersList(),
-        getScheduleGroups(teacherId),
+        getScheduleGroups(),
       ]).then((list) async {
         List<Teacher> teachers = list[0];
-        List<DayOfWeek> schedule = list[1];
-        await _cache.saveSchedule(schedule
-            .map((dow) => dow.scheduleGroups)
-            .fold([], (l1, l2) => l1 + l2));
+        List<ScheduleGroup> scheduleGroups = list[1];
+        await _cache.saveSchedule(scheduleGroups);
         await _cache.saveTeachersList(teachers);
+        final List<DayOfWeek> makeSchedule = _makeSchedule(scheduleGroups
+            .where((g) => teacherId == 0 || g.teacherId == teacherId)
+            .toList());
         return ScheduleInitialModel(
           false,
           teachers,
-          schedule,
+          makeSchedule,
           authedTeacherId,
         );
       }).catchError((e) {
@@ -70,14 +71,12 @@ class Repo {
     });
   }
 
-  Future<List<DayOfWeek>> getScheduleGroups(int teacherId) async {
-    final String url = await _addAccessToken(
-        "$BASE_URL$API_PREFIX/schedule${teacherId != null ? "?teacherId=$teacherId" : ""}");
+  Future<List<ScheduleGroup>> getScheduleGroups() async {
+    final String url = await _addAccessToken("$BASE_URL$API_PREFIX/schedule");
     final http.Response response = await http.get(url);
     _checkStatusCode(response);
     final List list = json.decode(response.body);
-    final scheduleGroups = list.map((q) => ScheduleGroup.fromJson(q)).toList();
-    return _makeSchedule(scheduleGroups);
+    return list.map((q) => ScheduleGroup.fromJson(q)).toList();
   }
 
   Future<List<Teacher>> getTeachersList() async {
@@ -122,7 +121,7 @@ class Repo {
 void main() async {
   final repo = Repo();
 
-  final schedule = await repo.getScheduleGroups(1);
+  final schedule = await repo.getScheduleGroups();
   for (final s in schedule) {
     print(s);
   }

@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
       child: StoreBuilder<ScheduleViewState>(
         onInit: (store) => store.dispatch(LoadItems()),
         builder: (context, store) => MaterialApp(
-              title: 'crmit_schedule',
+              title: 'Расписание',
               theme: ThemeData(
                 primarySwatch: Colors.red,
                 scaffoldBackgroundColor: Colors.white,

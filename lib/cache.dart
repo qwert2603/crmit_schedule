@@ -60,11 +60,10 @@ void main() async {
   final repo = Repo();
   final cache = Cache();
 
-  final schedule = await repo.getScheduleGroups(0);
+  final schedule = await repo.getScheduleGroups();
   final teachers = await repo.getTeachersList();
 
-  cache.saveSchedule(
-      schedule.map((dow) => dow.scheduleGroups).fold([], (l1, l2) => l1 + l2));
+  cache.saveSchedule(schedule);
   cache.saveTeachersList(teachers);
 
   print(await cache.getTeachersList());
