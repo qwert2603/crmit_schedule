@@ -3,6 +3,7 @@ import 'package:crmit_schedule/const.dart';
 import 'package:crmit_schedule/custom_app_bar.dart';
 import 'package:crmit_schedule/entity.dart';
 import 'package:crmit_schedule/refresh_error_snackbar.dart';
+import 'package:crmit_schedule/repo.dart';
 import 'package:crmit_schedule/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -14,7 +15,7 @@ class _ScheduleViewModel {
   final void Function() onRetry;
   final Future<void> Function() onRefresh;
   final void Function(int) onTeacherSelected;
-  final void Function(int) onGroupClicked;
+  final void Function(ScheduleGroup) onGroupClicked;
 
   _ScheduleViewModel.fromStore(Store<ScheduleViewState> store)
       : this(
@@ -27,7 +28,7 @@ class _ScheduleViewModel {
             return refreshItems.completer.future;
           },
           (teacherId) => store.dispatch(SelectedTeacherChanged(teacherId)),
-          (groupId) => store.dispatch(NavigateToGroup(groupId)),
+          (scheduleGroup) => store.dispatch(NavigateToGroup(scheduleGroup)),
         );
 
   _ScheduleViewModel(this.lrState, this.selectedTeacherId, this.onRetry,
@@ -43,12 +44,22 @@ final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 final _scrollController = ScrollController();
 
 class ScheduleScreen extends StatelessWidget {
+  final IconData appBarLeading;
+
+  const ScheduleScreen({Key key, @required this.appBarLeading})
+      : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
         appBar: AppBar(
           title: Text("Расписание"),
+          leading: IconButton(
+            icon: Icon(appBarLeading),
+            onPressed: () =>
+                schedulePlatform.invokeMethod("onNavigationIconClicked"),
+          ),
         ),
         onTap: () => _scrollController.animateTo(
               0,
@@ -187,7 +198,7 @@ class ScheduleScreen extends StatelessWidget {
   Widget _buildDayOfWeek(
     DayOfWeek dayOfWeek,
     int authedTeacherId,
-    void Function(int) onGroupClicked,
+    void Function(ScheduleGroup) onGroupClicked,
   ) {
     const textStyle = TextStyle(
       fontFamily: "google_sans",
@@ -198,7 +209,7 @@ class ScheduleScreen extends StatelessWidget {
     final scheduleGroups = dayOfWeek.scheduleGroups
         .where((s) => s is ScheduleGroup && s.dayOfWeek == dayOfWeek.dayOfWeek)
         .map((s) => InkWell(
-              onTap: () => onGroupClicked(s.groupId),
+              onTap: () => onGroupClicked(s),
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Row(

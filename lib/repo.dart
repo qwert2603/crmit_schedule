@@ -7,26 +7,16 @@ import 'package:crmit_schedule/state.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
-const _schedulePlatform = const MethodChannel('app.channel.schedule');
+const schedulePlatform = const MethodChannel('app.channel.schedule');
 
 class Repo {
   final Cache _cache = Cache();
 
-  Repo() {
-    _schedulePlatform.setMethodCallHandler((call) {
-      if (call.method == 'clearCache') {
-        print("Repo clearCache");
-        return Future.wait([
-          _cache.clearTeachers(),
-          _cache.clearSchedule(),
-        ]);
-      }
-      return Future.error("not implemented");
+  void navigateToGroup(ScheduleGroup scheduleGroup) {
+    schedulePlatform.invokeMethod("navigateToGroup", {
+      "groupId": scheduleGroup.groupId,
+      "groupName": scheduleGroup.groupName,
     });
-  }
-
-  void navigateToGroup(int groupId) {
-    _schedulePlatform.invokeMethod("navigateToGroup", {"groupId": groupId});
   }
 
   Future<ScheduleInitialModel> getScheduleInitialModel(
@@ -89,12 +79,12 @@ class Repo {
   }
 
   Future<int> getAuthedTeacherIdOrZero() async =>
-      _schedulePlatform.invokeMethod("getAuthedTeacherIdOrZero");
+      schedulePlatform.invokeMethod("getAuthedTeacherIdOrZero");
 
   void _checkStatusCode(http.Response response) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       if (response.statusCode == 401) {
-        _schedulePlatform.invokeMethod("on401");
+        schedulePlatform.invokeMethod("on401");
       }
       throw Exception("response.statusCode == ${response.statusCode}");
     }
@@ -104,7 +94,7 @@ class Repo {
       "$url${url.contains('?') ? "&" : "?"}access_token=${await _getAccessToken()}";
 
   Future<String> _getAccessToken() =>
-      _schedulePlatform.invokeMethod("getAccessToken");
+      schedulePlatform.invokeMethod("getAccessToken");
 
   List<DayOfWeek> _makeSchedule(List<ScheduleGroup> scheduleGroups) {
     final List<DayOfWeek> result = [];

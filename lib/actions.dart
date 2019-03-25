@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:crmit_schedule/entity.dart';
 import 'package:crmit_schedule/state.dart';
 
 class LoadItems {}
@@ -27,7 +28,7 @@ class SelectedTeacherChanged {
 }
 
 class NavigateToGroup {
-  final int groupId;
+  final ScheduleGroup scheduleGroup;
 
-  NavigateToGroup(this.groupId);
+  NavigateToGroup(this.scheduleGroup);
 }

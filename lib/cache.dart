@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:crmit_schedule/entity.dart';
 import 'package:crmit_schedule/repo.dart';
-import 'package:path_provider/path_provider.dart';
 
 class Cache {
   static const FILE_NAME_TEACHERS = "teachers.json";
@@ -49,7 +48,12 @@ class Cache {
       File("${(await _getCacheDir()).path}/$FILE_NAME_SCHEDULE");
 
   // Directory("/home/alex/StudioProjects/crmit_schedule/crmit_schedule/lib");
-  Future<Directory> _getCacheDir() async => getTemporaryDirectory();
+  Future<Directory> _getCacheDir() async {
+    final String path = await schedulePlatform.invokeMethod("getCacheDir");
+    final directory = Directory(path);
+    directory.createSync(recursive: true);
+    return directory;
+  }
 
   static void _deleteIfExist(File file) {
     if (file.existsSync()) file.deleteSync();

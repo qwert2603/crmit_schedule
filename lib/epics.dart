@@ -76,7 +76,7 @@ class NavigationMiddleware implements MiddlewareClass<ScheduleViewState> {
   void call(
       Store<ScheduleViewState> store, dynamic action, NextDispatcher next) {
     if (action is NavigateToGroup) {
-      repo.navigateToGroup(action.groupId);
+      repo.navigateToGroup(action.scheduleGroup);
     } else {
       next(action);
     }

@@ -28,12 +28,22 @@ public class MainActivity extends FlutterActivity {
                             }
                             if (call.method.contentEquals("on401")) {
                                 result.success(null);
-                                methodChannel.invokeMethod("clearCache", null);
+                                return;
+                            }
+                            if (call.method.contentEquals("getCacheDir")) {
+                                result.success(null);
                                 return;
                             }
                             if (call.method.contentEquals("navigateToGroup")) {
                                 int groupId = call.argument("groupId");
-                                Log.d("AASSDD", "MainActivity navigateToGroup " + groupId);
+                                String groupName = call.argument("groupName");
+                                Log.d("AASSDD", "MainActivity navigateToGroup " + groupId + " " + groupName);
+                                result.success(null);
+                                return;
+                            }
+                            if (call.method.contentEquals("onNavigationIconClicked")) {
+                                Log.d("AASSDD", "MainActivity onNavigationIconClicked");
+                                flutterInterface.onNavigationIconClicked();
                                 result.success(null);
                                 return;
                             }

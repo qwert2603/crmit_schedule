@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:crmit_schedule/actions.dart';
 import 'package:crmit_schedule/epics.dart';
 import 'package:crmit_schedule/reducer.dart';
@@ -23,13 +25,18 @@ void main() {
     ],
   );
 
-  runApp(MyApp(store: store));
+  runApp(MyApp(
+    store: store,
+    isRootScreen: window.defaultRouteName == "root",
+  ));
 }
 
 class MyApp extends StatelessWidget {
   final Store<ScheduleViewState> store;
+  final bool isRootScreen;
 
-  const MyApp({Key key, @required this.store}) : super(key: key);
+  const MyApp({Key key, @required this.store, @required this.isRootScreen})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +51,10 @@ class MyApp extends StatelessWidget {
                 scaffoldBackgroundColor: Colors.white,
                 fontFamily: "google_sans",
               ),
-              home: ScheduleScreen(),
+              home: ScheduleScreen(
+                appBarLeading:
+                    isRootScreen ? Icons.menu : Icons.arrow_back,
+              ),
             ),
       ),
     );
