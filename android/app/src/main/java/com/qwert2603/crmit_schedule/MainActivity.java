@@ -31,7 +31,7 @@ public class MainActivity extends FlutterActivity {
                                 return;
                             }
                             if (call.method.contentEquals("getCacheDir")) {
-                                result.success(null);
+                                result.success(getCacheDir().getPath());
                                 return;
                             }
                             if (call.method.contentEquals("navigateToGroup")) {
