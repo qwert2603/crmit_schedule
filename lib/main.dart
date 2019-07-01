@@ -1,4 +1,5 @@
 import 'package:crmit_schedule/actions.dart';
+import 'package:crmit_schedule/cache.dart';
 import 'package:crmit_schedule/epics.dart';
 import 'package:crmit_schedule/reducer.dart';
 import 'package:crmit_schedule/repo.dart';
@@ -10,8 +11,10 @@ import 'package:redux/redux.dart';
 import 'package:redux_dev_tools/redux_dev_tools.dart';
 import 'package:redux_epics/redux_epics.dart';
 
-void main() {
-  final repo = Repo();
+void main() async {
+  // "http://192.168.1.26:1918/api/v1.1.0/"
+  final baseUrl = await schedulePlatform.invokeMethod("getBaseUrl");
+  final repo = Repo(Cache(), baseUrl);
 
   final store = DevToolsStore<ScheduleViewState>(
     ScheduleReducer(),

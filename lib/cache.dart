@@ -61,8 +61,8 @@ class Cache {
 }
 
 void main() async {
-  final repo = Repo();
   final cache = Cache();
+  final repo = Repo(cache, "http://192.168.1.26:1918/api/v1.1.0/");
 
   final schedule = await repo.getScheduleGroups();
   final teachers = await repo.getTeachersList();

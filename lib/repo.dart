@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:crmit_schedule/cache.dart';
-import 'package:crmit_schedule/const.dart';
 import 'package:crmit_schedule/entity.dart';
 import 'package:crmit_schedule/state.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +9,11 @@ import 'package:http/http.dart' as http;
 const schedulePlatform = const MethodChannel('app.channel.schedule');
 
 class Repo {
-  final Cache _cache = Cache();
+  final Cache _cache;
+
+  final String _baseUrl;
+
+  Repo(this._cache, this._baseUrl);
 
   void navigateToGroup(ScheduleGroup scheduleGroup) {
     schedulePlatform.invokeMethod("navigateToGroup", {
@@ -62,7 +65,7 @@ class Repo {
   }
 
   Future<List<ScheduleGroup>> getScheduleGroups() async {
-    final String url = await _addAccessToken("$BASE_URL$API_PREFIX/schedule");
+    final String url = await _addAccessToken("${_baseUrl}schedule");
     final http.Response response = await http.get(url);
     _checkStatusCode(response);
     final List list = json.decode(response.body);
@@ -70,8 +73,7 @@ class Repo {
   }
 
   Future<List<Teacher>> getTeachersList() async {
-    final String url =
-        await _addAccessToken("$BASE_URL$API_PREFIX/teachers_list");
+    final String url = await _addAccessToken("${_baseUrl}teachers_list");
     final http.Response response = await http.get(url);
     _checkStatusCode(response);
     final List list = json.decode(response.body);
@@ -109,7 +111,7 @@ class Repo {
 }
 
 void main() async {
-  final repo = Repo();
+  final repo = Repo(Cache(), "http://192.168.1.26:1918/api/v1.1.0");
 
   final schedule = await repo.getScheduleGroups();
   for (final s in schedule) {
