@@ -19,7 +19,7 @@ public class MainActivity extends FlutterActivity {
                 .setMethodCallHandler(
                         (call, result) -> {
                             if (call.method.contentEquals("getAuthedTeacherIdOrZero")) {
-                                result.success(1);
+                                result.success(0);
                                 return;
                             }
                             if (call.method.contentEquals("getAccessToken")) {
@@ -43,7 +43,7 @@ public class MainActivity extends FlutterActivity {
                             }
                             if (call.method.contentEquals("onNavigationIconClicked")) {
                                 Log.d("AASSDD", "MainActivity onNavigationIconClicked");
-                                flutterInterface.onNavigationIconClicked();
+                                MainActivity.this.finish();
                                 result.success(null);
                                 return;
                             }

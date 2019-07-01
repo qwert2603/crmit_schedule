@@ -44,11 +44,6 @@ final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 final _scrollController = ScrollController();
 
 class ScheduleScreen extends StatelessWidget {
-  final IconData appBarLeading;
-
-  const ScheduleScreen({Key key, @required this.appBarLeading})
-      : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +51,7 @@ class ScheduleScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text("Расписание"),
           leading: IconButton(
-            icon: Icon(appBarLeading),
+            icon: Icon(Icons.arrow_back),
             onPressed: () =>
                 schedulePlatform.invokeMethod("onNavigationIconClicked"),
           ),
